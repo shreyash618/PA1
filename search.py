@@ -90,7 +90,30 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    print("Start:", problem.getStartState())
+    dfs_stack = util.Stack()
+    visited = []
+
+    # pushing the initial successors from the starting point
+    for successor in problem.getSuccessors(problem.getStartState()):    
+        dfs_stack.push((successor, [successor[1]]))
+
+    #iterative DFS
+    while not dfs_stack.isEmpty():
+        #keeping track of the visited vertex and the path to get to said vertex
+        visited_vertex, actions_to_goal = dfs_stack.pop()
+
+        #checking if we have reached the goal
+        if problem.isGoalState(visited_vertex[0]):
+            return actions_to_goal
+
+        #if not the goal, we append to visited then get its successors to add to the stack
+        visited.append(visited_vertex[0])
+        successor_list = problem.getSuccessors(visited_vertex[0])
+        for successor in successor_list:    
+            if(successor[0] not in visited):
+                dfs_stack.push((successor, actions_to_goal + [successor[1]]))
+    # util.raiseNotDefined()
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
