@@ -140,7 +140,33 @@ def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    priority_q = util.PriorityQueue()
+    visited = []
+    visited.append(problem.getStartState())
+
+    for successor in problem.getSuccessors(problem.getStartState()):    
+        # pushing in the successor and its action, then its cost is the priority
+        priority_q.push(item=(successor, [successor[1]]), priority=successor[2])
+
+    while not priority_q.isEmpty():
+        #  pop to get min priority item in queue; you get vertex, and then its action
+        visited_vertex, action = priority_q.pop()
+
+        # if it has been already visited, do not explore more
+        if visited_vertex[0] in visited:
+            continue
+        #if it is the goal we return a list of actions
+        if problem.isGoalState(visited_vertex[0]):
+            return action
+        
+        #otherwise, mark as visited and explore its successors by adding to priority q  
+        visited.append(visited_vertex[0])
+        successor_list = problem.getSuccessors(visited_vertex[0])
+        for successor in successor_list:    
+            if(successor[0] not in visited):
+                priority_q.push(item=(successor, action + [successor[1]]), priority=(problem.getCostOfActions(action)+successor[2]))
+    
+    # util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None) -> float:
     """
