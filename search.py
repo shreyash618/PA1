@@ -175,10 +175,42 @@ def nullHeuristic(state, problem=None) -> float:
     """
     return 0
 
+# each node has an f, g and h where:
+# f is the total (estimated) cost of the path through the current node (this is also the priority in the priority queue)
+# g is the distance between start node and current node
+# h is the (estimated) cost from the current node to the goal 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    open_list = util.PriorityQueue()
+    closed_list = set()
+
+    start_state = problem.getStartState()
+    #print(f"Start State: {start_state}\n") ## I want to know what the start state looks like depending on the problem
+    #open_list structure: (current_node, directions, g_cost) with priority = f_cost (g_cost + heurisitic)
+    open_list.push((start_state, [], 0), heuristic(start_state, problem)) ## (f_cost is simply the heuristic in this case)
+    
+    # a map to keep track of the best g_cost for each state
+    g_cost_map = {start_state: 0}
+
+    while not open_list.isEmpty():
+        # pop the state with the lowest f_cost
+        current_node, path, g_cost = open_list.pop()
+        # if we've reached the goal, return the map
+        if problem.isGoalState(current_node):
+            return path
+        # mark the current node as visited
+        closed_list.add(current_node)
+        for successor, action, stepCost in problem.getSuccessors(current_node):
+            new_g_cost = g_cost + stepCost
+            f_cost = new_g_cost + heuristic(successor, problem=problem)
+            #ignore if the successor is in the closed list
+            if successor in closed_list:
+                continue
+            if successor not in g_cost_map or new_g_cost < g_cost_map[successor]:
+                g_cost_map[successor] = new_g_cost
+                open_list.push((successor, path + [action], new_g_cost), f_cost)
+    return[]
+    #util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
