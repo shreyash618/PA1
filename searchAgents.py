@@ -296,19 +296,14 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        # returns the starting position and a frozen set to store the corners
-        return (self.startingPosition, frozenset())
+        util.raiseNotDefined()
 
     def isGoalState(self, state: Any):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        # if all four corners are reached, returns true
-        pacman, visited = state
-        if len(visited)==4:
-            return True
-        # util.raiseNotDefined()
+        util.raiseNotDefined()
 
     def getSuccessors(self, state: Any):
         """
@@ -331,20 +326,6 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
-            # getting the xy of pacman and the visited corners
-            pacman, visited = state
-            x,y = pacman
-            dx, dy = Actions.directionToVector(action)
-            nextx, nexty = int(x + dx), int(y + dy)
-            hitsWall = self.walls[nextx][nexty]
-            # checking if pacman has hit a wall or else do next state
-            if not hitsWall:
-                nextState = (nextx, nexty)
-                # check for the corners and match them with OR
-                if nextState in self.corners:
-                    visited = visited | frozenset([nextState])
-                # return the next state and corresponding corners
-                successors.append(((nextState, visited), action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
         return successors
@@ -478,6 +459,8 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
     def registerInitialState(self, state):
+        #print(f"State: {state}")
+        #print(f"Self: {self}")
         self.actions = []
         currentState = state
         while(currentState.getFood().count() > 0):
@@ -503,12 +486,13 @@ class ClosestDotSearchAgent(SearchAgent):
         walls = gameState.getWalls()
         problem = AnyFoodSearchProblem(gameState)
 
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        return search.breadthFirstSearch(problem)
+        #util.raiseNotDefined()
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
-    A search problem for finding a path to any food.
+    A search problem for FINDING A PATH TO ANY FOOD!!!!!
 
     This search problem is just like the PositionSearchProblem, but has a
     different goal test, which you need to fill in below.  The state space and
@@ -526,6 +510,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         # Store the food for later reference
         self.food = gameState.getFood()
 
+        #print(f"{self.food}")
         # Store info for the PositionSearchProblem (no need to change this)
         self.walls = gameState.getWalls()
         self.startState = gameState.getPacmanPosition()
@@ -534,13 +519,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
     def isGoalState(self, state: Tuple[int, int]):
         """
-        The state is Pacman's position. Fill this in with a goal test that will
-        complete the problem definition.
+        The state is Pacman's position. This method checks if Pacman has found a food pellet at it's current position.
         """
         x,y = state
-
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # True means it has food and false means it doesn't
+        return self.food[x][y] 
+        #util.raiseNotDefined()
 
 def mazeDistance(point1: Tuple[int, int], point2: Tuple[int, int], gameState: pacman.GameState) -> int:
     """
