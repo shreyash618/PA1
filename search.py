@@ -198,14 +198,18 @@ def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directi
         # if we've reached the goal, return the map
         if problem.isGoalState(current_node):
             return path
+        # if the node has already been expanded with a lower cost, skip it
+        if current_node in closed_list and g_cost >= g_cost_map[current_node]:
+            continue
         # mark the current node as visited
         closed_list.add(current_node)
         for successor, action, stepCost in problem.getSuccessors(current_node):
             new_g_cost = g_cost + stepCost
             f_cost = new_g_cost + heuristic(successor, problem=problem)
-            #ignore if the successor is in the closed list
-            if successor in closed_list:
-                continue
+            # if the successor is already in the closed list and the new path is better
+            if successor in closed_list and new_g_cost < g_cost_map.get(successor, float('inf')):
+                # remove it from the closed list so the node can be expanded again
+                closed_list.remove(successor)
             if successor not in g_cost_map or new_g_cost < g_cost_map[successor]:
                 g_cost_map[successor] = new_g_cost
                 open_list.push((successor, path + [action], new_g_cost), f_cost)
