@@ -90,7 +90,7 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
+    #print("Start:", problem.getStartState())
     dfs_stack = util.Stack()
     visited = []
 
