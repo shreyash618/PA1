@@ -486,11 +486,13 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
+    #problem.heuristicInfo['wallCount'] = problem.walls.count()
     foodCoordinates = foodGrid.asList() ##stores the coordinates where food is a list
-    print(f"Food Coordinates: {foodCoordinates}")
+    #print(f"Food Coordinates: {foodCoordinates}")
     if len(foodCoordinates) == 0: ##if the food grid is empty
         return 0
-    distances = [util.manhattanDistance(position, food) for food in foodCoordinates]
+    #distances = [util.manhattanDistance(position, food) for food in foodCoordinates]
+    distances = [mazeDistance(position, food, problem.startingGameState) for food in foodCoordinates]
     return max(distances)
 
 class ClosestDotSearchAgent(SearchAgent):
