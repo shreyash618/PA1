@@ -383,15 +383,20 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
 
     "*** YOUR CODE HERE ***"
     #assuming that what I get back from the state is the current position and the unvisisted corners
-    current_position, unvisisted_corners =  state
+    current_position, visited_corners =  state
+
     
-    if not unvisisted_corners:
+    if len(visited_corners) == 4:
         return 0
     else:
-        uc_list = list(unvisisted_corners)
+        all_corners = set(problem.corners)
+        unvisited_corners=all_corners-visited_corners
+        #uc_list = list(unvisisted_corners)
         manhattanDistances =[]
-        for corner in uc_list:
-            manhattanDistances.append(manhattanHeuristic(current_position, corner))
+        for corner in unvisited_corners: #uc_list:\
+            state_x, state_y = current_position
+            corner_x, corner_y = corner
+            manhattanDistances.append(abs(corner_x - state_x) + abs(corner_y - state_y))
         return max(manhattanDistances)
         
 class AStarCornersAgent(SearchAgent):
@@ -481,8 +486,14 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
-
+    #problem.heuristicInfo['wallCount'] = problem.walls.count()
+    foodCoordinates = foodGrid.asList() ##stores the coordinates where food is a list
+    #print(f"Food Coordinates: {foodCoordinates}")
+    if len(foodCoordinates) == 0: ##if the food grid is empty
+        return 0
+    #distances = [util.manhattanDistance(position, food) for food in foodCoordinates]
+    distances = [mazeDistance(position, food, problem.startingGameState) for food in foodCoordinates]
+    return max(distances)
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
