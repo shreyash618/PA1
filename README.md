@@ -1,6 +1,6 @@
 -# CS 440: Introduction to Artificial Intelligence
 -# Professor Wang Xintong
--# Shreya Shukla (ss4515) and Medhasri Veldurthi (mv670)
+-# Shreya Shukla and Medhasri Veldurthi
 -# Programming Assignment #1
 -# 09/30/2024
 
