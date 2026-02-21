@@ -90,17 +90,83 @@ def depthFirstSearch(problem: SearchProblem) -> List[Directions]:
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    #print("Start:", problem.getStartState())
+    dfs_stack = util.Stack()
+    visited = []
+
+    # pushing the initial successors from the starting point
+    for successor in problem.getSuccessors(problem.getStartState()):    
+        dfs_stack.push((successor, [successor[1]]))
+
+    #iterative DFS
+    while not dfs_stack.isEmpty():
+        #keeping track of the visited vertex and the path to get to said vertex
+        visited_vertex, actions_to_goal = dfs_stack.pop()
+
+        #checking if we have reached the goal
+        if problem.isGoalState(visited_vertex[0]):
+            return actions_to_goal
+
+        #if not the goal, we append to visited then get its successors to add to the stack
+        visited.append(visited_vertex[0])
+        successor_list = problem.getSuccessors(visited_vertex[0])
+        for successor in successor_list:    
+            if(successor[0] not in visited):
+                dfs_stack.push((successor, actions_to_goal + [successor[1]]))
+    # util.raiseNotDefined()
 
 def breadthFirstSearch(problem: SearchProblem) -> List[Directions]:
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    search_queue = util.Queue() ##queue
+    visited = set() ##2d array
+
+    search_queue.push((problem.getStartState(), [])) ##add the start state to the search tree
+    visited.add(problem.getStartState())
+
+    while not search_queue.isEmpty():
+        current_state, path = search_queue.pop()
+
+        if problem.isGoalState(current_state):
+            return path
+        
+        for successor, action, stepcost in problem.getSuccessors(current_state):
+            if successor not in visited:
+                search_queue.push ((successor, path + [action]))
+                visited.add(successor)
+    return []
+    ##util.raiseNotDefined()
 
 def uniformCostSearch(problem: SearchProblem) -> List[Directions]:
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    priority_q = util.PriorityQueue()
+    visited = []
+    visited.append(problem.getStartState())
+
+    for successor in problem.getSuccessors(problem.getStartState()):    
+        # pushing in the successor and its action, then its cost is the priority
+        priority_q.push(item=(successor, [successor[1]]), priority=successor[2])
+
+    while not priority_q.isEmpty():
+        #  pop to get min priority item in queue; you get vertex, and then its action
+        visited_vertex, action = priority_q.pop()
+
+        # if it has been already visited, do not explore more
+        if visited_vertex[0] in visited:
+            continue
+        #if it is the goal we return a list of actions
+        if problem.isGoalState(visited_vertex[0]):
+            return action
+        
+        #otherwise, mark as visited and explore its successors by adding to priority q  
+        visited.append(visited_vertex[0])
+        successor_list = problem.getSuccessors(visited_vertex[0])
+        for successor in successor_list:    
+            if(successor[0] not in visited):
+                priority_q.push(item=(successor, action + [successor[1]]), priority=(problem.getCostOfActions(action)+successor[2]))
+    
+    # util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None) -> float:
     """
@@ -109,10 +175,46 @@ def nullHeuristic(state, problem=None) -> float:
     """
     return 0
 
+# each node has an f, g and h where:
+# f is the total (estimated) cost of the path through the current node (this is also the priority in the priority queue)
+# g is the distance between start node and current node
+# h is the (estimated) cost from the current node to the goal 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic) -> List[Directions]:
     """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    open_list = util.PriorityQueue()
+    closed_list = set()
+
+    start_state = problem.getStartState()
+    #print(f"Start State: {start_state}\n") ## I want to know what the start state looks like depending on the problem
+    #open_list structure: (current_node, directions, g_cost) with priority = f_cost (g_cost + heurisitic)
+    open_list.push((start_state, [], 0), heuristic(start_state, problem)) ## (f_cost is simply the heuristic in this case)
+    
+    # a map to keep track of the best g_cost for each state
+    g_cost_map = {start_state: 0}
+
+    while not open_list.isEmpty():
+        # pop the state with the lowest f_cost
+        current_node, path, g_cost = open_list.pop()
+        # if we've reached the goal, return the map
+        if problem.isGoalState(current_node):
+            return path
+        # if the node has already been expanded with a lower cost, skip it
+        if current_node in closed_list and g_cost >= g_cost_map[current_node]:
+            continue
+        # mark the current node as visited
+        closed_list.add(current_node)
+        for successor, action, stepCost in problem.getSuccessors(current_node):
+            new_g_cost = g_cost + stepCost
+            f_cost = new_g_cost + heuristic(successor, problem=problem)
+            # if the successor is already in the closed list and the new path is better
+            if successor in closed_list and new_g_cost < g_cost_map.get(successor, float('inf')):
+                # remove it from the closed list so the node can be expanded again
+                closed_list.remove(successor)
+            if successor not in g_cost_map or new_g_cost < g_cost_map[successor]:
+                g_cost_map[successor] = new_g_cost
+                open_list.push((successor, path + [action], new_g_cost), f_cost)
+    return[]
+    #util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
